@@ -47,15 +47,15 @@ response = client.post('/users/soandso/loans/123958915158', {"op" => "renew"})
 response = client.put('/users/soandso', 'json_body_string_alma_is_expecting_to_receive')
 
 ```
-`get_all` method tries twice to get full list of results from Alma. This returns an AlmaRestClient::Response object which has a code, message, and parsed_response. The full list is of the form of a normal `AlmaRestClient#get` method, if there was a limit "ALL" option.
+`get_all` method tries twice to get full list of results from Alma. This returns an AlmaRestClient::Response object which has a code, message, and parsed_response. The full list is of the form of a normal `AlmaRestClient#get` method, if there was a limit "ALL" option. `get_all` method uses keyword arguments. `:url` and `:record_key` are required arguments.
 
 ```ruby
 #all are instance methods
 client = AlmaRestClient.client
 
 #get_all without options
-response = client.get_all('/users/soandso/loans')
+response = client.get_all(url: '/users/soandso/loans', record_key: 'item_loan')
 
 #get_all with options; this method overwrites 'limit' and 'offset'
-response = client.get_all('/users/soandso/loans', {"expand" => "renewable"})
+response = client.get_all(url: '/users/soandso/loans', record_key: 'item_loan', query: {"expand" => "renewable"})
 ```

@@ -35,7 +35,7 @@ module AlmaRestClient
     end
 
     #record_key is the key that holds the array of items 
-    def get_all(url, record_key, limit=100, query={})
+    def get_all(url:, record_key:, limit: 100, query: {})
       try_count = 1
       while try_count <= 2
         response = get_all_loop(url, record_key, limit, query)

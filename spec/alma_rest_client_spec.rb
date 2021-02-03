@@ -41,13 +41,13 @@ RSpec.describe AlmaRestClient::Client do
       expect(subject.put('/users/soandso', input).class.name).to eq("HTTParty::Response")
     end
   end
-  context "#get_all(url, record_key, limit, query)" do
+  context "#get_all(url:, record_key:, limit:, query:)" do
     it "makes multiple calls to the alma server and returns appropriate response." do
       url = "users/jbister/loans"
       stub_alma_get_request( query: { "limit" => 1, "offset" => 0}, body: File.read("./spec/fixtures/jbister_loans0.json"), url: url) 
       stub_alma_get_request( query: { "limit" => 1, "offset" => 1}, body: File.read("./spec/fixtures/jbister_loans1.json"), url: url) 
 
-      response = described_class.new.get_all("/#{url}", "item_loan", 1)
+      response = described_class.new.get_all(url: "/#{url}", record_key: "item_loan", limit: 1)
       expect(response.class.name).to eq("AlmaRestClient::Response")
       expect(response.code).to eq(200)
       expect(response.parsed_response["item_loan"].count).to eq(2)
@@ -56,7 +56,7 @@ RSpec.describe AlmaRestClient::Client do
       url = "users/jbister/loans"
       stub1 = stub_alma_get_request( query: { "limit" => 1, "offset" => 0}, body: File.read("./spec/fixtures/jbister_loans0.json"), url: url) 
       stub2 = stub_alma_get_request( query: { "limit" => 1, "offset" => 1}, body: "", url: url, status: 500) 
-      response = described_class.new.get_all("/#{url}", "item_loan", 1)
+      response = described_class.new.get_all(url: "/#{url}", record_key: "item_loan", limit:1)
       expect(response.class.name).to eq("AlmaRestClient::Response")
       expect(response.code).to eq(500)
       expect(response.message).to eq('Could not retrieve items.')
@@ -69,7 +69,7 @@ RSpec.describe AlmaRestClient::Client do
       stub2 = stub_alma_get_request( query: { "limit" => 1, "offset" => 1}, body: "", url: url, status: 500) 
       stub2.then.to_return({body: File.read("./spec/fixtures/jbister_loans1.json"), status: 200, headers: {content_type: 'application/json'}}) 
 
-      response = described_class.new.get_all("/#{url}", "item_loan", 1)
+      response = described_class.new.get_all(url: "/#{url}", record_key: "item_loan", limit:1)
       expect(stub1).to have_been_requested.times(2)
       expect(stub2).to have_been_requested.times(2)
 
