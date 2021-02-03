@@ -26,7 +26,7 @@ ALMA_API_HOST
 ALMA_API_KEY
 ```
 ## Usage
-All of the following methods return an HTTParty parsed response from Alma
+All of the following methods return an HTTParty::Response from Alma
 ```ruby
 #all are instance methods
 client = AlmaRestClient.client
