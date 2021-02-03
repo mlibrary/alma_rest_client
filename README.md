@@ -7,7 +7,7 @@ This gem retrieves Alma data from the Alma API. It extends the HTTParty gem.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'alma_rest_client'
+gem 'alma_rest_client',
   git: 'https://github.com/mlibrary/alma_rest_client', 
   branch: 'main'
 ```
