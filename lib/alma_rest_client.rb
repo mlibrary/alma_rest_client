@@ -1,5 +1,7 @@
 require "alma_rest_client/version"
+require "ox"
 require 'httparty'
+require  "cgi"
 
 module AlmaRestClient
   class Error < StandardError; end
@@ -48,7 +50,39 @@ module AlmaRestClient
       Response.new(code: 500, message: 'Could not retrieve items.')
     end 
 
+    def get_report(path:, filter: nil)
+      query = {path: CGI.escape(URI.encode(path)), limit: 1000, col_names: true}
+      report_loop(query)
+    end
+
     private
+
+    def report_loop(query)
+      output = []
+      columns = {}
+      response = get("/analytics/reports", query)
+      xml = Ox.load(response.parsed_response["anies"].first, mode: :hash, symbolize_keys: false)
+      query[:token] = xml["QueryResult"]["ResumptionToken"]
+      col_raw = xml["QueryResult"]["ResultXml"]["rowset"]["xsd:schema"][1]["xsd:complexType"][1]["xsd:sequence"]["xsd:element"]
+      col_raw.each {|x| columns[x.first["name"]] = x.first["saw-sql:columnHeading"] }
+
+      loop do
+        rows = xml["QueryResult"]["ResultXml"]["rowset"]["Row"]
+        rows = [ rows ] if rows.class == Hash
+        rows.each do |row|
+          my_row = {}
+          row.keys.each {|k| my_row[columns[k]] = row[k] }
+          output.push(my_row)
+        end
+        if xml["QueryResult"]["IsFinished"] == 'true'
+          break
+        else
+          response = get("/analytics/reports", query)
+          xml = Ox.load(response.parsed_response["anies"].first, mode: :hash, symbolize_keys: false)
+        end
+      end
+      Response.new(parsed_response: output)
+    end
     #query keys 'limit' and 'offset' will be overwritten
     def get_all_loop(url, record_key, limit, query={})
       query[:offset] = 0 

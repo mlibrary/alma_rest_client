@@ -1,3 +1,4 @@
+require 'cgi'
 RSpec.describe AlmaRestClient do
   it "has a version number" do
     expect(AlmaRestClient::VERSION).not_to be nil
@@ -78,6 +79,29 @@ RSpec.describe AlmaRestClient::Client do
       expect(response.parsed_response["item_loan"].count).to eq(2)
     end
 
+  end
+  
+  context "#get_report(path:, column_names: true)" do
+    before(:each) do
+      @path = "/shared/University of Michigan 01UMICH_INST/Reports/fake-data" 
+      @encoded_path = CGI.escape(URI.encode(@path))
+      @base_report_url = "analytics/reports"
+    end
+    it "returns appropriate number of Rows for a single page report" do
+      stub_alma_get_request(url: @base_report_url, body: File.read("./spec/fixtures/circ_history.json"), query: {path: @encoded_path, "col_names" => "true", "limit" => 1000} )
+      response = described_class.new.get_report(path: @path)
+      expect(response.class.name).to eq("AlmaRestClient::Response")
+      expect(response.code).to eq(200)
+      expect(response.parsed_response.count).to eq(2)
+    end
+    it "returns the appropriate number of Rows for multipage report" do
+      stub_alma_get_request(url: @base_report_url, body: File.read("./spec/fixtures/circ_history1.json"), query: {path: @encoded_path, "col_names" => "true", "limit" => 1000} )
+      stub_alma_get_request(url: @base_report_url, body: File.read("./spec/fixtures/circ_history2.json"), query: {path: @encoded_path, "col_names" => "true", "limit" => 1000, "token" => "fakeResumptionToken"} )
+      response = described_class.new.get_report(path: @path)
+      expect(response.class.name).to eq("AlmaRestClient::Response")
+      expect(response.code).to eq(200)
+      expect(response.parsed_response.count).to eq(3)
+    end
   end
   
 end

@@ -28,6 +28,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_runtime_dependency "httparty"
+  spec.add_runtime_dependency "ox"
 
   spec.add_development_dependency "byebug"
   spec.add_development_dependency "rspec"

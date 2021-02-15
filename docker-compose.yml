@@ -9,7 +9,7 @@ services:
       - .:/app
       - gem_cache:/gems
     environment:
-      - ALMA_API_HOST='https://api-na.hosted.exlibrisgroup.com'
-      - ALMA_API_KEY='almaapikey'
+      - ALMA_API_HOST=https://api-na.hosted.exlibrisgroup.com
+      - ALMA_API_KEY=almaapikey
 volumes:
   gem_cache:
