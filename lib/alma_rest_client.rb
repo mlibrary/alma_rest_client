@@ -1,7 +1,6 @@
 require "alma_rest_client/version"
 require "ox"
 require 'httparty'
-require  "cgi"
 
 module AlmaRestClient
   class Error < StandardError; end
@@ -51,16 +50,31 @@ module AlmaRestClient
     end 
 
     def get_report(path:, filter: nil)
-      query = {path: CGI.escape(URI.encode(path)), limit: 1000, col_names: true}
-      report_loop(query)
+      query = { path: path, limit: 1000, col_names: true}
+      puts query[:path]
+      try_count = 1
+      while try_count <= 2
+        response = report_loop(**query)
+        if response.code == 200
+          return response
+        else
+          try_count = try_count + 1
+        end
+      end
+      Response.new(code: 500, message: 'Could not retrieve report.')
     end
 
     private
 
-    def report_loop(query)
+    def report_loop(path:,limit:,col_names:)
       output = []
       columns = {}
+      query = {path: path, limit: limit, col_names: col_names }
       response = get("/analytics/reports", query)
+      if response.code != 200 
+        puts response
+        return Response.new(code: 500, message: 'Could not retrieve report.')
+      end
       xml = Ox.load(response.parsed_response["anies"].first, mode: :hash, symbolize_keys: false)
       query[:token] = xml["QueryResult"]["ResumptionToken"]
       col_raw = xml["QueryResult"]["ResultXml"]["rowset"]["xsd:schema"][1]["xsd:complexType"][1]["xsd:sequence"]["xsd:element"]
@@ -78,7 +92,12 @@ module AlmaRestClient
           break
         else
           response = get("/analytics/reports", query)
-          xml = Ox.load(response.parsed_response["anies"].first, mode: :hash, symbolize_keys: false)
+          if response.code == 200          
+            xml = Ox.load(response.parsed_response["anies"].first, mode: :hash, symbolize_keys: false)
+          else
+            puts response
+            return Response.new(code: 500, message: 'Could not retrieve report.')
+          end
         end
       end
       Response.new(parsed_response: output)

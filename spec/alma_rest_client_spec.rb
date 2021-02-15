@@ -84,23 +84,56 @@ RSpec.describe AlmaRestClient::Client do
   context "#get_report(path:, column_names: true)" do
     before(:each) do
       @path = "/shared/University of Michigan 01UMICH_INST/Reports/fake-data" 
-      @encoded_path = CGI.escape(URI.encode(@path))
+      @alma_query_params = { 
+        "col_names" => true,
+        "limit" => 1000,
+        "path" => @path
+      }
       @base_report_url = "analytics/reports"
     end
     it "returns appropriate number of Rows for a single page report" do
-      stub_alma_get_request(url: @base_report_url, body: File.read("./spec/fixtures/circ_history.json"), query: {path: @encoded_path, "col_names" => "true", "limit" => 1000} )
+      stub_alma_get_request(url: @base_report_url, body: File.read("./spec/fixtures/circ_history.json"), query: {**@alma_query_params} )
       response = described_class.new.get_report(path: @path)
       expect(response.class.name).to eq("AlmaRestClient::Response")
       expect(response.code).to eq(200)
       expect(response.parsed_response.count).to eq(2)
     end
     it "returns the appropriate number of Rows for multipage report" do
-      stub_alma_get_request(url: @base_report_url, body: File.read("./spec/fixtures/circ_history1.json"), query: {path: @encoded_path, "col_names" => "true", "limit" => 1000} )
-      stub_alma_get_request(url: @base_report_url, body: File.read("./spec/fixtures/circ_history2.json"), query: {path: @encoded_path, "col_names" => "true", "limit" => 1000, "token" => "fakeResumptionToken"} )
+      stub_alma_get_request(url: @base_report_url, body: File.read("./spec/fixtures/circ_history1.json"), query: {**@alma_query_params} )
+      stub_alma_get_request(url: @base_report_url, body: File.read("./spec/fixtures/circ_history2.json"), query: {**@alma_query_params, "token" => "fakeResumptionToken"} )
       response = described_class.new.get_report(path: @path)
       expect(response.class.name).to eq("AlmaRestClient::Response")
       expect(response.code).to eq(200)
       expect(response.parsed_response.count).to eq(3)
+    end
+    it "if alma requests fail to get everything on page 2+, it tries again and if it fails again it returns an error" do
+      stub1 = stub_alma_get_request( query: {**@alma_query_params}, body: File.read("./spec/fixtures/circ_history1.json"), url: @base_report_url) 
+      stub2 = stub_alma_get_request(url: @base_report_url, body: "", query: {**@alma_query_params, "token" => "fakeResumptionToken"}, status: 500 )
+      response = described_class.new.get_report(path: @path)
+      expect(response.class.name).to eq("AlmaRestClient::Response")
+      expect(response.code).to eq(500)
+      expect(response.message).to eq('Could not retrieve report.')
+      expect(stub1).to have_been_requested.times(2)
+      expect(stub2).to have_been_requested.times(2)
+    end
+    it "if alma requests fail to get everything on first page, it tries again and if it fails again it returns an error" do
+      stub1 = stub_alma_get_request(url: @base_report_url, body: "", query: {**@alma_query_params}, status: 500 )
+      response = described_class.new.get_report(path: @path)
+      expect(response.class.name).to eq("AlmaRestClient::Response")
+      expect(response.code).to eq(500)
+      expect(response.message).to eq('Could not retrieve report.')
+      expect(stub1).to have_been_requested.times(2)
+    end
+    it "if alma requests succeed the second time, returns the " do
+      stub1 = stub_alma_get_request( query: {**@alma_query_params}, body: File.read("./spec/fixtures/circ_history1.json"), url: @base_report_url) 
+      stub2 = stub_alma_get_request(url: @base_report_url, body: "", query: {**@alma_query_params, "token" => "fakeResumptionToken"}, status: 500 ).then.to_return({body: File.read("./spec/fixtures/circ_history2.json"), status: 200, headers: {content_type: 'application/json'}}) 
+
+      response = described_class.new.get_report(path: @path)
+      expect(response.class.name).to eq("AlmaRestClient::Response")
+      expect(response.code).to eq(200)
+      expect(response.parsed_response.count).to eq(3)
+      expect(stub1).to have_been_requested.times(2)
+      expect(stub2).to have_been_requested.times(2)
     end
   end
   
