@@ -59,3 +59,13 @@ response = client.get_all(url: '/users/soandso/loans', record_key: 'item_loan')
 #get_all with options; this method overwrites 'limit' and 'offset'
 response = client.get_all(url: '/users/soandso/loans', record_key: 'item_loan', query: {"expand" => "renewable"})
 ```
+`get_report` method tries twice to get a full report from Alma. This returns an AlmaRestClient::Response object which has a code, message, and parsed_response. For a successfully retrieved report, the parsed response is an array of report rows. Each row element is a hash where the keys are the column names of the report. `get_report` method uses the keyword argument `:path` 
+
+```ruby
+#all are instance methods
+client = AlmaRestClient.client
+
+#get_report
+response = client.get_report(path: '/shared/University of Michigan 01UMICH_INST/Reports/fake-data')
+
+```
