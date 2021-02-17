@@ -51,7 +51,6 @@ module AlmaRestClient
 
     def get_report(path:, filter: nil)
       query = { path: path, limit: 1000, col_names: true}
-      puts query[:path]
       try_count = 1
       while try_count <= 2
         response = report_loop(**query)
@@ -72,7 +71,6 @@ module AlmaRestClient
       query = {path: path, limit: limit, col_names: col_names }
       response = get("/analytics/reports", query)
       if response.code != 200 
-        puts response
         return Response.new(code: 500, message: 'Could not retrieve report.')
       end
       xml = Ox.load(response.parsed_response["anies"].first, mode: :hash, symbolize_keys: false)
@@ -95,7 +93,6 @@ module AlmaRestClient
           if response.code == 200          
             xml = Ox.load(response.parsed_response["anies"].first, mode: :hash, symbolize_keys: false)
           else
-            puts response
             return Response.new(code: 500, message: 'Could not retrieve report.')
           end
         end
