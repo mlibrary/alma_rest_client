@@ -22,11 +22,10 @@ module AlmaRestClient
       self.class.headers 'Accept' => 'application/json'
     end
 
-    def get(url, query={})
-      self.class.get(url, query: query)
-    end
-    def post(url, query={})
-      self.class.post(url, query: query)
+    [:get, :post, :delete].each do |name|
+      define_method(name) do |url, query={}|
+        self.class.public_send(name, url, query: query)
+      end
     end
 
     #requires valid json for the body

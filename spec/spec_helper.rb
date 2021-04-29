@@ -15,36 +15,19 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
-def stub_alma_get_request(url:, body: "{}",status: 200, query: {})
-    stub_request(:get, "#{ENV["ALMA_API_HOST"]}/almaws/v1/#{url}").with( 
-      headers: {   
-          accept: 'application/json', 
-          Authorization: "apikey #{ENV['ALMA_API_KEY']}",
-          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'User-Agent'=>'Ruby'
-      },
-      query: query,
-    ).to_return(body: body, status: status, headers: {content_type: 'application/json'})   
-end
+[:get, :post,:put, :delete].each do |name|
+  define_method("stub_alma_#{name}_request") do |url:, input: nil, output: "", status: 200, query: nil|
+    req_attributes = Hash.new
+    req_attributes[:headers] = {   
+      accept: 'application/json', 
+      Authorization: "apikey #{ENV['ALMA_API_KEY']}",
+      'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+      'User-Agent'=>'Ruby'
+    }
+    req_attributes[:body] = input unless input.nil?
+    req_attributes[:query] = query unless query.nil?
+    resp = { headers: {content_type: 'application/json'}, status: status, body: output }
 
-def stub_alma_post_request(url:, body: "{}",status: 200, query: {})
-    stub_request(:post, "#{ENV["ALMA_API_HOST"]}/almaws/v1/#{url}").with( 
-      headers: {   
-          accept: 'application/json', 
-          Authorization: "apikey #{ENV['ALMA_API_KEY']}",
-          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'User-Agent'=>'Ruby'
-      },
-      query: query,
-    ).to_return(body: body, status: status, headers: {content_type: 'application/json'})   
-end
-def stub_alma_put_request(url:, input:, output:, status: 200)
-    stub_request(:put, "#{ENV["ALMA_API_HOST"]}/almaws/v1/#{url}").with( 
-      body: input,
-      headers: {   
-          accept: 'application/json', 
-          Authorization: "apikey #{ENV['ALMA_API_KEY']}",
-          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'User-Agent'=>'Ruby'
-      }).to_return(body: output, status: status, headers: {content_type: 'application/json'})   
+    stub_request(name, "#{ENV["ALMA_API_HOST"]}/almaws/v1/#{url}").with( **req_attributes).to_return(**resp)   
+  end
 end
