@@ -34,6 +34,11 @@ module AlmaRestClient
       self.class.put(url, { body: body } )
     end
 
+    def post_with_body(url, body)
+      self.class.headers 'Content-Type' => 'application/json'
+      self.class.post(url, { body: body } )
+    end
+
     #record_key is the key that holds the array of items 
     def get_all(url:, record_key:, limit: 100, query: {})
       try_count = 1
