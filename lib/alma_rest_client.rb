@@ -20,6 +20,7 @@ module AlmaRestClient
     def initialize()
       self.class.headers 'Authorization' => "apikey #{ENV.fetch('ALMA_API_KEY')}"
       self.class.headers 'Accept' => 'application/json'
+      self.class.headers 'Content-Type' => 'application/json'
     end
 
     [:get, :post, :delete, :put].each do |name|
