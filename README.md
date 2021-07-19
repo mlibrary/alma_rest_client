@@ -9,7 +9,7 @@ Add this line to your application's Gemfile:
 ```ruby
 gem 'alma_rest_client',
   git: 'https://github.com/mlibrary/alma_rest_client', 
-  branch: 'main'
+  tag: '1.0.1' #this is the github release tag. It should match the gem version number. 
 ```
 
 And then execute:
