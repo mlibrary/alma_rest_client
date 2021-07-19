@@ -35,16 +35,16 @@ client = AlmaRestClient.client
 response = client.get('/users/soandso')
 
 # Get method with options
-response = client.get('/users/soandso/loans', {"limit" => 100, "expand" => "renewable"}
+response = client.get('/users/soandso/loans', query: {"limit" => 100, "expand" => "renewable"}
 
 #post method without options
 response = client.post('/users/soandso/loans/123958915158')
 
 #post method with options
-response = client.post('/users/soandso/loans/123958915158', {"op" => "renew"})
+response = client.post('/users/soandso/loans/123958915158', query: {"op" => "renew"}, body: 'string its expecting to receive')
 
 #put method
-response = client.put('/users/soandso', 'json_body_string_alma_is_expecting_to_receive')
+response = client.put('/users/soandso', body: 'json_body_string_alma_is_expecting_to_receive')
 
 ```
 `get_all` method tries twice to get full list of results from Alma. This returns an AlmaRestClient::Response object which has a code, message, and parsed_response. The full list is of the form of a normal `AlmaRestClient#get` method, if there was a limit "ALL" option. `get_all` method uses keyword arguments. `:url` and `:record_key` are required arguments.
