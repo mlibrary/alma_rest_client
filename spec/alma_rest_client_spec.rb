@@ -15,41 +15,45 @@ RSpec.describe AlmaRestClient::Client do
   subject do
     described_class.new
   end
-  context "#get(url, query={})" do
+  context "#get(url, query: {})" do
     it "returns HTTParty response for only url" do
       stub_alma_get_request(url: 'users/soandso')
       expect(subject.get('/users/soandso').class.name).to eq("HTTParty::Response")
     end
     it "returns HTTParty response for url and parameters" do
       stub_alma_get_request(url: 'users/soandso/loans', query: {"limit" => 100})
-      expect(subject.get('/users/soandso/loans', {"limit" => 100}).class.name).to eq("HTTParty::Response")
+      expect(subject.get('/users/soandso/loans', query: {"limit" => 100}).class.name).to eq("HTTParty::Response")
     end
   end
-  context "#post(url, query={})" do
+  context "#post(url, {query:, body:})" do
     it "returns HTTParty response for only url" do
       stub_alma_post_request(url: 'users/soandso/loans')
       expect(subject.post('/users/soandso/loans').class.name).to eq("HTTParty::Response")
     end
     it "returns HTTParty response for url and parameters" do
       stub_alma_post_request(url: 'users/soandso/loans', query: {"op" => "renew"})
-      expect(subject.post('/users/soandso/loans', {"op" => "renew"}).class.name).to eq("HTTParty::Response")
+      expect(subject.post('/users/soandso/loans', query: {"op" => "renew"}).class.name).to eq("HTTParty::Response")
+    end
+    it "handles query and body" do
+      stub_alma_post_request(url: 'users/soandso/loans', query: {"op" => "hold"}, input: {thing: 'stuff'})
+      expect(subject.post('/users/soandso/loans', query: {"op" => "hold"}, body: {thing: 'stuff'}).class.name).to eq("HTTParty::Response")
     end
   end
-  context "#delete(url, query={})" do
+  context "#delete(url, query: {})" do
     it "returns HTTParty response for only url" do
       stub_alma_delete_request(url: 'users/soandso/requests/12345')
       expect(subject.delete('/users/soandso/requests/12345').class.name).to eq("HTTParty::Response")
     end
     it "returns HTTParty response for url and parameters" do
       stub_alma_delete_request(url: 'users/soandso/requests/12345', query: {"reason" => "REASON"})
-      expect(subject.delete('/users/soandso/requests/12345', {"reason" => "REASON"}).class.name).to eq("HTTParty::Response")
+      expect(subject.delete('/users/soandso/requests/12345', query: {"reason" => "REASON"}).class.name).to eq("HTTParty::Response")
     end
   end
   context "#put(url, body)" do
     it "returns HTTParty response for url and body" do
       input = 'iamastring'.to_json
       stub_alma_put_request(url: 'users/soandso', input: input, output: "{}" )
-      expect(subject.put('/users/soandso', input).class.name).to eq("HTTParty::Response")
+      expect(subject.put('/users/soandso', body: input).class.name).to eq("HTTParty::Response")
     end
   end
   context "#get_all(url:, record_key:, limit:, query:)" do
