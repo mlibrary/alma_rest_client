@@ -36,7 +36,7 @@ RSpec.describe AlmaRestClient::Client do
     end
     it "handles query and body" do
       stub_alma_post_request(url: 'users/soandso/loans', query: {"op" => "hold"}, input: {thing: 'stuff'})
-      expect(subject.post('/users/soandso/loans', query: {"op" => "hold"}, body: {thing: 'stuff'}).class.name).to eq("HTTParty::Response")
+      expect(subject.post('/users/soandso/loans', query: {"op" => "hold"}, body: {thing: 'stuff'}.to_json).class.name).to eq("HTTParty::Response")
     end
   end
   context "#delete(url, query: {})" do
