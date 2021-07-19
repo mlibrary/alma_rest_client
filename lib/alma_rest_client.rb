@@ -22,17 +22,17 @@ module AlmaRestClient
       self.class.headers 'Accept' => 'application/json'
     end
 
-    [:get, :post, :delete].each do |name|
-      define_method(name) do |url, query={}|
-        self.class.public_send(name, url, query: query)
+    [:get, :post, :delete, :put].each do |name|
+      define_method(name) do |url, options={}|
+        self.class.public_send(name, url, options)
       end
     end
 
-    #requires valid json for the body
-    def put(url, body)
-      self.class.headers 'Content-Type' => 'application/json'
-      self.class.put(url, { body: body } )
-    end
+    ##requires valid json for the body
+    #def put(url, body)
+      #self.class.headers 'Content-Type' => 'application/json'
+      #self.class.put(url, { body: body } )
+    #end
 
     #record_key is the key that holds the array of items 
     def get_all(url:, record_key:, limit: 100, query: {})
@@ -68,7 +68,7 @@ module AlmaRestClient
       output = []
       columns = {}
       query = {path: path, limit: limit, col_names: col_names }
-      response = get("/analytics/reports", query)
+      response = get("/analytics/reports", query: query)
       if response.code != 200 
         return Response.new(code: 500, message: 'Could not retrieve report.')
       end
@@ -88,7 +88,7 @@ module AlmaRestClient
         if xml["QueryResult"]["IsFinished"] == 'true'
           break
         else
-          response = get("/analytics/reports", query)
+          response = get("/analytics/reports", query: query)
           if response.code == 200          
             xml = Ox.load(response.parsed_response["anies"].first, mode: :hash, symbolize_keys: false)
           else
@@ -102,12 +102,12 @@ module AlmaRestClient
     def get_all_loop(url, record_key, limit, query={})
       query[:offset] = 0 
       query[:limit] = limit
-      output = get(url, query)
+      output = get(url, query: query)
       if output.code == 200
         body = output.parsed_response
         while  body['total_record_count'] > limit + query[:offset]
           query[:offset] = query[:offset] + limit
-          my_output = get(url, query) 
+          my_output = get(url, query: query) 
           if my_output.code == 200
             my_output.parsed_response[record_key].each {|x| body[record_key].push(x)}
           else
