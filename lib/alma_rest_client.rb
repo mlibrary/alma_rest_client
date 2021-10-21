@@ -1,6 +1,6 @@
 require "alma_rest_client/version"
-require "ox"
 require 'httparty'
+require 'active_support/core_ext/hash/conversions'
 
 module AlmaRestClient
   class Error < StandardError; end
@@ -28,12 +28,6 @@ module AlmaRestClient
         self.class.public_send(name, url, options)
       end
     end
-
-    ##requires valid json for the body
-    #def put(url, body)
-      #self.class.headers 'Content-Type' => 'application/json'
-      #self.class.put(url, { body: body } )
-    #end
 
     #record_key is the key that holds the array of items 
     def get_all(url:, record_key:, limit: 100, query: {})
@@ -73,10 +67,11 @@ module AlmaRestClient
       if response.code != 200 
         return Response.new(code: 500, message: 'Could not retrieve report.')
       end
-      xml = Ox.load(response.parsed_response["anies"].first, mode: :hash, symbolize_keys: false)
+      xml_string = response.parsed_response["anies"].first
+      xml = Hash.from_xml(xml_string)
       query[:token] = xml["QueryResult"]["ResumptionToken"]
-      col_raw = xml["QueryResult"]["ResultXml"]["rowset"]["xsd:schema"][1]["xsd:complexType"][1]["xsd:sequence"]["xsd:element"]
-      col_raw.each {|x| columns[x.first["name"]] = x.first["saw-sql:columnHeading"] }
+      col_raw = xml["QueryResult"]["ResultXml"]["rowset"]["schema"]["complexType"]["sequence"]["element"]
+      col_raw.each {|x| columns[x["name"]] = x["saw-sql:columnHeading"] }
 
       loop do
         rows = xml["QueryResult"]["ResultXml"]["rowset"]["Row"]
@@ -91,7 +86,7 @@ module AlmaRestClient
         else
           response = get("/analytics/reports", query: query)
           if response.code == 200          
-            xml = Ox.load(response.parsed_response["anies"].first, mode: :hash, symbolize_keys: false)
+            xml = Hash.from_xml(response.parsed_response["anies"].first)
           else
             return Response.new(code: 500, message: 'Could not retrieve report.')
           end
