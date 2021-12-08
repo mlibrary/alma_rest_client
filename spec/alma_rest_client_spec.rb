@@ -153,6 +153,14 @@ RSpec.describe AlmaRestClient::Client do
       expect(stub1).to have_been_requested.times(2)
       expect(stub2).to have_been_requested.times(2)
     end
+    it "can take a block" do
+      stub_alma_get_request(url: base_report_url, output: circ_history1, query: {**alma_query_params} )
+      stub_alma_get_request(url: base_report_url, output: circ_history2, query: {**alma_query_params, "token" => "fakeResumptionToken"} )
+      my_output = []
+      response = described_class.new.get_report(path: path){|row| my_output.push(row)}
+      expect(response.code).to eq(200)
+      expect(my_output.count).to eq(3) 
+    end
   end
   
 end

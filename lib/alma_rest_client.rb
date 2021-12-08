@@ -50,11 +50,17 @@ module AlmaRestClient
       Response.new(code: 500, message: 'Could not retrieve items.')
     end 
 
-    def get_report(path:, filter: nil)
+    def get_report(path:, filter: nil, &block)
       query = { path: path, limit: 1000, col_names: true}
+
       try_count = 1
       begin 
-        report_loop(**query)
+        if block_given?
+          start_report(**query, &block)
+          return Response.new(code: 200, message: 'success')
+        else
+          default_report(**query)
+        end
       rescue 
         if try_count < 2
           try_count = try_count+1
@@ -71,9 +77,8 @@ module AlmaRestClient
       cols = col_raw.map {|x| [x["name"],  x["saw_sql:columnHeading"]] }.to_h
     end
 
-    def report_loop(path:,limit:,col_names:)
+    def default_report(query)
       output = []
-      query = {path: path, limit: limit, col_names: col_names }
       start_report(query) do |row|
         output.push(row)
       end
@@ -86,9 +91,9 @@ module AlmaRestClient
       xml = Hash.from_xml(xml_string)
       query[:token] = xml["QueryResult"]["ResumptionToken"]
       columns = get_columns(xml)
-      report_actual_loop(xml, columns, query, &block) 
+      report_loop(xml, columns, query, &block) 
     end
-    def report_actual_loop(xml, columns, query, &block)
+    def report_loop(xml, columns, query, &block)
         rows = xml["QueryResult"]["ResultXml"]["rowset"]["Row"]
         rows = [ rows ] if rows.class == Hash
         rows.each do |row|
@@ -99,7 +104,7 @@ module AlmaRestClient
         if xml["QueryResult"]["IsFinished"] != 'true'
           response = get("/analytics/reports", query: query)
           xml = Hash.from_xml(response.parsed_response["anies"].first)
-          report_actual_loop(xml, columns, query, &block)
+          report_loop(xml, columns, query, &block)
         end
     end
     #query keys 'limit' and 'offset' will be overwritten
