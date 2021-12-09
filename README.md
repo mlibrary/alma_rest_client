@@ -99,6 +99,12 @@ Build the image
 $ docker-compose build
 ```
 
+Install the gems
+```
+$ docker-compose run --rm web bundle install
+```
+
+
 Run the tests
 ```
 $ docker-compose run --rm web bundle exec rspec
