@@ -9,7 +9,7 @@ Add this line to your application's Gemfile:
 ```ruby
 gem 'alma_rest_client',
   git: 'https://github.com/mlibrary/alma_rest_client', 
-  tag: '1.0.1' #this is the github release tag. It should match the gem version number. 
+  tag: '1.2.0' #this is the github release tag. It should match the gem version number. 
 ```
 
 And then execute:
@@ -87,12 +87,12 @@ $ git clone git@github.com:mlibrary/alma_rest_client.git
 $ cd alma_rest_client
 ```
 
-Copy .env-example to .env
+Copy `.env-example` to `.env`
 ```
 $ cp .env-example .env
 ```
 
-Replace the value for `ALMA_API_KEY` with a real key with appropriate permissions
+Edit `.env` Replace the value for `ALMA_API_KEY` with a real key with appropriate permissions
 
 Build the image
 ```
