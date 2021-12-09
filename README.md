@@ -78,3 +78,22 @@ response = client.get_report(path: '/shared/University of Michigan 01UMICH_INST/
   my_array.push(row)
 end
 ```
+
+## How to Contribute
+
+Copy .env-example to .env
+```
+$ cp .env-example .env
+```
+
+Replace the value for `ALMA_API_KEY` with a real key with appropriate permissions
+
+Build the image
+```
+$ docker-compose build
+```
+
+Run the tests
+```
+$ docker-compose run --rm web bundle exec rspec
+```
