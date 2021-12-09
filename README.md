@@ -81,6 +81,12 @@ end
 
 ## How to Contribute
 
+Clone the repository and cd into it
+```
+$ git clone git@github.com:mlibrary/alma_rest_client.git
+$ cd alma_rest_client
+```
+
 Copy .env-example to .env
 ```
 $ cp .env-example .env
