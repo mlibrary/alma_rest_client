@@ -79,24 +79,23 @@ RSpec.describe AlmaRestClient::Client do
       expect(response.class.name).to eq("AlmaRestClient::Response")
       expect(response.code).to eq(500)
       expect(response.message).to eq('Could not retrieve items.')
-      expect(stub1).to have_been_requested.times(2)
+      expect(stub1).to have_been_requested.times(1)
       expect(stub2).to have_been_requested.times(2)
     end
-    it "if alma requests fail to get everything the first time, it tries again and if it succeeds returns successful full results" do
+    it "if alma requests fail to get everything the first time, it tries the page call again and if it succeeds returns successful full results" do
       url = "users/jbister/loans"
       stub1 = stub_loan_0
       stub2 = stub_alma_get_request( query: { "limit" => 1, "offset" => 1}, url: url, status: 500) 
       stub2.then.to_return({body: loans1, status: 200, headers: {content_type: 'application/json'}}) 
 
       response = described_class.new.get_all(url: "/#{url}", record_key: "item_loan", limit:1)
-      expect(stub1).to have_been_requested.times(2)
+      expect(stub1).to have_been_requested.times(1)
       expect(stub2).to have_been_requested.times(2)
 
       expect(response.class.name).to eq("AlmaRestClient::Response")
       expect(response.code).to eq(200)
       expect(response.parsed_response["item_loan"].count).to eq(2)
     end
-
   end
   
   context "#get_report(path:, column_names: true)" do
