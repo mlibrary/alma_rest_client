@@ -59,7 +59,12 @@ response = client.get_all(url: '/users/soandso/loans', record_key: 'item_loan')
 #get_all with options; this method overwrites 'limit' and 'offset'
 response = client.get_all(url: '/users/soandso/loans', record_key: 'item_loan', query: {"expand" => "renewable"})
 ```
-`get_report` method tries twice to get a full report from Alma. This returns an AlmaRestClient::Response object which has a code, message, and parsed_response. For a successfully retrieved report, the parsed response is an array of report rows. Each row element is a hash where the keys are the column names of the report. `get_report` method uses the keyword argument `:path` 
+`get_report` method is used for working Alma Analytics reports. It takes the argument `:path` which is the path to the analytics report. It can take a block or no block.
+
+When no block is given to `get_report` it returns an `AlmaRestClient::Response` object which has a code, messsage, and parsed_response. The parsed response is an array of report rows. Each row element is a hash where the keys are the column names of the report. 
+
+When a block is given, the block can work with a row of the report. Each row is a hash where the keys are the column names of the report. If it's successful it will return a successful `AlmaRestClient::Response` object.  
+
 
 ```ruby
 #all are instance methods
@@ -68,4 +73,45 @@ client = AlmaRestClient.client
 #get_report
 response = client.get_report(path: '/shared/University of Michigan 01UMICH_INST/Reports/fake-data')
 
+my_array = []
+response = client.get_report(path: '/shared/University of Michigan 01UMICH_INST/Reports/fake-data') do |row|
+  my_array.push(row)
+end
+```
+
+## How to Contribute
+
+Clone the repository and cd into it
+```
+$ git clone git@github.com:mlibrary/alma_rest_client.git
+$ cd alma_rest_client
+```
+
+Copy .env-example to .env
+```
+$ cp .env-example .env
+```
+
+Replace the value for `ALMA_API_KEY` with a real key with appropriate permissions
+
+Build the image
+```
+$ docker-compose build
+```
+
+Install the gems
+```
+$ docker-compose run --rm web bundle install
+```
+
+
+Run the tests
+```
+$ docker-compose run --rm web bundle exec rspec
+```
+
+To run the gem in irb
+```
+$ docker-compose run --rm web bundle exec irb
+irb> client = AlmaRestClient.client
 ```
