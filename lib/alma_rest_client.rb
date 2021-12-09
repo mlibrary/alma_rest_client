@@ -53,7 +53,6 @@ module AlmaRestClient
     def get_report(path:, filter: nil, &block)
       query = { path: path, limit: 1000, col_names: true}
 
-      try_count = 1
       begin 
         if block_given?
           start_report(**query, &block)
@@ -62,12 +61,7 @@ module AlmaRestClient
           default_report(**query)
         end
       rescue 
-        if try_count < 2
-          try_count = try_count+1
-          retry
-        else
-          return Response.new(code: 500, message: 'Could not retrieve report.')
-        end
+        return Response.new(code: 500, message: 'Could not retrieve report.')
       end
     end
 
@@ -84,11 +78,18 @@ module AlmaRestClient
       end
       Response.new(parsed_response: output)
     end
+    def fetch_report_page(query)
+      try_count = 1
+      begin
+        response = get("/analytics/reports", query: query)
+        Hash.from_xml(response.parsed_response["anies"].first)
+      rescue
+        try_count += 1
+        retry if try_count <= 2
+      end
+    end
     def start_report(query, &block)
-      response = get("/analytics/reports", query: query)
-
-      xml_string = response.parsed_response["anies"].first
-      xml = Hash.from_xml(xml_string)
+      xml = fetch_report_page(query)
       query[:token] = xml["QueryResult"]["ResumptionToken"]
       columns = get_columns(xml)
       report_loop(xml, columns, query, &block) 
@@ -102,8 +103,7 @@ module AlmaRestClient
         block.call(my_row)
       end
       if xml["QueryResult"]["IsFinished"] != 'true'
-        response = get("/analytics/reports", query: query)
-        xml = Hash.from_xml(response.parsed_response["anies"].first)
+        xml = fetch_report_page(query)
         report_loop(xml, columns, query, &block)
       end
     end

@@ -124,14 +124,14 @@ RSpec.describe AlmaRestClient::Client do
       expect(response.code).to eq(200)
       expect(response.parsed_response.count).to eq(3)
     end
-    it "if alma requests fail to get everything on page 2+, it tries again and if it fails again it returns an error" do
+    it "if alma requests fail to get everything on page 2+, it tries again for that page and if it fails again it returns an error" do
       stub1 = stub_alma_get_request( query: {**alma_query_params}, output: circ_history1, url: base_report_url) 
       stub2 = stub_alma_get_request(url: base_report_url, query: {**alma_query_params, "token" => "fakeResumptionToken"}, status: 500 )
       response = described_class.new.get_report(path: path)
       expect(response.class.name).to eq("AlmaRestClient::Response")
       expect(response.code).to eq(500)
       expect(response.message).to eq('Could not retrieve report.')
-      expect(stub1).to have_been_requested.times(2)
+      expect(stub1).to have_been_requested.times(1)
       expect(stub2).to have_been_requested.times(2)
     end
     it "if alma requests fail to get everything on first page, it tries again and if it fails again it returns an error" do
@@ -142,7 +142,7 @@ RSpec.describe AlmaRestClient::Client do
       expect(response.message).to eq('Could not retrieve report.')
       expect(stub1).to have_been_requested.times(2)
     end
-    it "if alma requests succeed the second time, returns the " do
+    it "if alma requests succeed the second time, returns the expected result" do
       stub1 = stub_alma_get_request( query: {**alma_query_params}, output: circ_history1, url: base_report_url) 
       stub2 = stub_alma_get_request(url: base_report_url, query: {**alma_query_params, "token" => "fakeResumptionToken"}, status: 500 ).then.to_return({body: circ_history2, status: 200, headers: {content_type: 'application/json'}}) 
 
@@ -150,7 +150,7 @@ RSpec.describe AlmaRestClient::Client do
       expect(response.class.name).to eq("AlmaRestClient::Response")
       expect(response.code).to eq(200)
       expect(response.parsed_response.count).to eq(3)
-      expect(stub1).to have_been_requested.times(2)
+      expect(stub1).to have_been_requested.times(1)
       expect(stub2).to have_been_requested.times(2)
     end
     it "can take a block" do
@@ -160,6 +160,18 @@ RSpec.describe AlmaRestClient::Client do
       response = described_class.new.get_report(path: path){|row| my_output.push(row)}
       expect(response.code).to eq(200)
       expect(my_output.count).to eq(3) 
+    end
+    it "works properly for a 500 error on middle page" do
+      stub1 = stub_alma_get_request(url: base_report_url, output: circ_history1, query: {**alma_query_params} )
+      stub2 = stub_alma_get_request(url: base_report_url, query: {**alma_query_params, "token" => "fakeResumptionToken"}, status:500 )
+        .then.to_return({body: circ_history1, status: 200, headers: {content_type: 'application/json'}}) 
+        .then.to_return({body: circ_history2, status: 200, headers: {content_type: 'application/json'}}) 
+      response = described_class.new.get_report(path: path)
+      expect(response.class.name).to eq("AlmaRestClient::Response")
+      expect(response.code).to eq(200)
+      expect(response.parsed_response.count).to eq(5)
+      expect(stub1).to have_been_requested.times(1)
+      expect(stub2).to have_been_requested.times(3)
     end
   end
   
