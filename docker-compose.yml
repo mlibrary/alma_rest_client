@@ -9,6 +9,6 @@ services:
     environment:
       - ALMA_API_HOST=https://api-na.hosted.exlibrisgroup.com
     env_file:
-      -.env
+      - .env
 volumes:
   gem_cache:

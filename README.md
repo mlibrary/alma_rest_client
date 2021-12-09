@@ -97,3 +97,9 @@ Run the tests
 ```
 $ docker-compose run --rm web bundle exec rspec
 ```
+
+To run the gem in irb
+```
+$ docker-compose run --rm web bundle exec irb
+irb> client = AlmaRestClient.client
+```
