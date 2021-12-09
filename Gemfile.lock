@@ -1,9 +1,10 @@
 PATH
   remote: .
   specs:
-    alma_rest_client (1.1.0)
+    alma_rest_client (1.2.0)
       activesupport (~> 6.0, >= 4.2)
       httparty
+      rexml
 
 GEM
   remote: https://rubygems.org/

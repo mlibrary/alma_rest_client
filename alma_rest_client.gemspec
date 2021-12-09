@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
+  spec.add_runtime_dependency "rexml"
   spec.add_runtime_dependency "httparty"
   spec.add_runtime_dependency "activesupport", '>= 4.2', '~> 6.0'
 
