@@ -6,16 +6,16 @@ jobs:
   # Run tests
   test:
     runs-on: ubuntu-latest
-    env:
-      ALMA_API_KEY: 'YOUR_ALMA_API_KEY'
-      ALMA_API_HOST: 'https://api-na.hosted.exlibrisgroup.com'
     steps:
       - uses: actions/checkout@v2
+      - name: Create .env file
+        run: cat .env-example > .env
+      - name: Load .env file
+        uses: xom9ikk/dotenv@v1.0.2
       - name: Set up Ruby 2.7.2
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.7.2
-      - name: Bundle install
-        run: bundle install --jobs 4 --retry 3
+          bundler-cache: true
       - name: Run tests
         run: bundle exec rspec
