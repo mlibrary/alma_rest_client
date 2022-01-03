@@ -91,7 +91,7 @@ module AlmaRestClient
       report_loop(xml, columns, query, &block) 
     end
     def report_loop(xml, columns, query, &block)
-      rows = xml["QueryResult"]["ResultXml"]["rowset"]["Row"]
+      rows = xml["QueryResult"]["ResultXml"]["rowset"]["Row"] || []
       rows = [ rows ] if rows.class == Hash
       rows.each do |row|
         my_row = {}
