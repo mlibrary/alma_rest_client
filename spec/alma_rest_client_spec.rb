@@ -104,9 +104,17 @@ RSpec.describe AlmaRestClient::Client do
     let(:alma_query_params) { { "col_names" => true, "limit" => 1000, "path" => path } }
 
 
+    let(:empty_circ_history) {File.read("./spec/fixtures/circ_history_empty.json")}
     let(:circ_history) {File.read("./spec/fixtures/circ_history.json")}
     let(:circ_history1) {File.read("./spec/fixtures/circ_history1.json")}
     let(:circ_history2) {File.read("./spec/fixtures/circ_history2.json")}
+    it "handles empty report" do
+      stub_alma_get_request(url: base_report_url, output: empty_circ_history, query: {**alma_query_params} )
+      response = described_class.new.get_report(path: path)
+      expect(response.class.name).to eq("AlmaRestClient::Response")
+      expect(response.code).to eq(200)
+      expect(response.parsed_response.count).to eq(0)
+    end
 
     it "returns appropriate number of Rows for a single page report" do
       stub_alma_get_request(url: base_report_url, output: circ_history, query: {**alma_query_params} )
