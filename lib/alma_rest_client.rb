@@ -41,7 +41,7 @@ module AlmaRestClient
       try_count = 1
       begin
         get_all_loop(url, record_key, limit, query)
-      rescue
+      rescue => error
         Response.new(code: 500, message: 'Could not retrieve items.')
       end
     end 
@@ -56,8 +56,8 @@ module AlmaRestClient
         else
           default_report(query, retries)
         end
-      rescue 
-        return Response.new(code: 500, message: 'Could not retrieve report.')
+      rescue => error
+        return Response.new(code: 500, message: error)
       end
     end
 
@@ -78,8 +78,9 @@ module AlmaRestClient
       try_count = 1
       begin
         response = get("/analytics/reports", query: query)
+        raise StandardError.new response.parsed_response if response.code != 200
         Hash.from_xml(response.parsed_response["anies"].first)
-      rescue
+      rescue => error
         try_count += 1
         retry if try_count <= retries
       end
@@ -109,7 +110,7 @@ module AlmaRestClient
         response = get(url, query: query) 
         raise StandardError if response.code != 200
         response
-      rescue
+      rescue => error
         try_count += 1
         retry if try_count <= 2
       end
