@@ -137,7 +137,7 @@ RSpec.describe AlmaRestClient::Client do
       response = described_class.new.get_report(path: path)
       expect(response.class.name).to eq("AlmaRestClient::Response")
       expect(response.code).to eq(500)
-      expect(response.message).to eq('Could not retrieve report.')
+      expect(response.message).to include('undefined method')
       expect(stub1).to have_been_requested.times(1)
       expect(stub2).to have_been_requested.times(2)
     end
@@ -147,7 +147,7 @@ RSpec.describe AlmaRestClient::Client do
       response = described_class.new.get_report(path: path, retries: 5)
       expect(response.class.name).to eq("AlmaRestClient::Response")
       expect(response.code).to eq(500)
-      expect(response.message).to eq('Could not retrieve report.')
+      expect(response.message).to include('undefined method')
       expect(stub1).to have_been_requested.times(1)
       expect(stub2).to have_been_requested.times(5)
     end
@@ -157,7 +157,7 @@ RSpec.describe AlmaRestClient::Client do
       response = described_class.new.get_report(path: path)
       expect(response.class.name).to eq("AlmaRestClient::Response")
       expect(response.code).to eq(500)
-      expect(response.message).to eq('Could not retrieve report.')
+      expect(response.message).to include('undefined method')
       expect(stub1).to have_been_requested.times(2)
     end
     it "if alma requests succeed the second time, returns the expected result" do

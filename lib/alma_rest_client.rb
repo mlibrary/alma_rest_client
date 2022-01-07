@@ -57,7 +57,7 @@ module AlmaRestClient
           default_report(query, retries)
         end
       rescue => error
-        return Response.new(code: 500, message: error)
+        return Response.new(code: 500, message: error.to_s)
       end
     end
 
