@@ -46,15 +46,15 @@ module AlmaRestClient
       end
     end 
 
-    def get_report(path:, filter: nil, &block)
+    def get_report(path:, filter: nil, retries: 2, &block)
       query = { path: path, limit: 1000, col_names: true}
 
       begin 
         if block_given?
-          start_report(**query, &block)
+          start_report(query, retries, &block)
           return Response.new(code: 200, message: 'success')
         else
-          default_report(**query)
+          default_report(query, retries)
         end
       rescue 
         return Response.new(code: 500, message: 'Could not retrieve report.')
@@ -67,30 +67,30 @@ module AlmaRestClient
       cols = col_raw.map {|x| [x["name"],  x["saw_sql:columnHeading"]] }.to_h
     end
 
-    def default_report(query)
+    def default_report(query, retries)
       output = []
-      start_report(query) do |row|
+      start_report(query, retries) do |row|
         output.push(row)
       end
       Response.new(parsed_response: output)
     end
-    def fetch_report_page(query)
+    def fetch_report_page(query, retries)
       try_count = 1
       begin
         response = get("/analytics/reports", query: query)
         Hash.from_xml(response.parsed_response["anies"].first)
       rescue
         try_count += 1
-        retry if try_count <= 2
+        retry if try_count <= retries
       end
     end
-    def start_report(query, &block)
-      xml = fetch_report_page(query)
+    def start_report(query, retries, &block)
+      xml = fetch_report_page(query, retries)
       query[:token] = xml["QueryResult"]["ResumptionToken"]
       columns = get_columns(xml)
-      report_loop(xml, columns, query, &block) 
+      report_loop(xml, columns, query, retries, &block) 
     end
-    def report_loop(xml, columns, query, &block)
+    def report_loop(xml, columns, query, retries, &block)
       rows = xml["QueryResult"]["ResultXml"]["rowset"]["Row"] || []
       rows = [ rows ] if rows.class == Hash
       rows.each do |row|
@@ -99,8 +99,8 @@ module AlmaRestClient
         block.call(my_row)
       end
       if xml["QueryResult"]["IsFinished"] != 'true'
-        xml = fetch_report_page(query)
-        report_loop(xml, columns, query, &block)
+        xml = fetch_report_page(query, retries)
+        report_loop(xml, columns, query, retries, &block)
       end
     end
     def fetch_results_page(url, query)
