@@ -95,7 +95,7 @@ module AlmaRestClient
       rows = [ rows ] if rows.class == Hash
       rows.each do |row|
         my_row = {}
-        row.keys.each {|k| my_row[columns[k]] = row[k] }
+        columns.keys.each {|k| my_row[columns[k]] = row[k] }
         block.call(my_row)
       end
       if xml["QueryResult"]["IsFinished"] != 'true'
