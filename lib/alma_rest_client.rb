@@ -63,7 +63,7 @@ module AlmaRestClient
 
     private
     def get_columns(xml)
-      col_raw = xml["QueryResult"]["ResultXml"]["rowset"]["schema"]["complexType"]["sequence"]["element"]
+      col_raw = xml.dig("QueryResult","ResultXml","rowset","schema","complexType","sequence","element")
       cols = col_raw.map {|x| [x["name"],  x["saw_sql:columnHeading"]] }.to_h
     end
 
@@ -87,19 +87,19 @@ module AlmaRestClient
     end
     def start_report(query, retries, &block)
       xml = fetch_report_page(query, retries)
-      query[:token] = xml["QueryResult"]["ResumptionToken"]
+      query[:token] = xml.dig("QueryResult","ResumptionToken")
       columns = get_columns(xml)
       report_loop(xml, columns, query, retries, &block) 
     end
     def report_loop(xml, columns, query, retries, &block)
-      rows = xml["QueryResult"]["ResultXml"]["rowset"]["Row"] || []
+      rows = xml.dig("QueryResult","ResultXml","rowset","Row") || []
       rows = [ rows ] if rows.class == Hash
       rows.each do |row|
         my_row = {}
         columns.keys.each {|k| my_row[columns[k]] = row[k] }
         block.call(my_row)
       end
-      if xml["QueryResult"]["IsFinished"] != 'true'
+      if xml.dig("QueryResult","IsFinished") != 'true'
         xml = fetch_report_page(query, retries)
         report_loop(xml, columns, query, retries, &block)
       end
