@@ -87,7 +87,7 @@ module AlmaRestClient
     end
     def start_report(query, retries, &block)
       xml = fetch_report_page(query, retries)
-      query[:token] = xml&.dig("QueryResult","ResumptionToken")
+      query[:token] = xml.dig("QueryResult","ResumptionToken")
       columns = get_columns(xml)
       report_loop(xml, columns, query, retries, &block) 
     end
@@ -99,7 +99,7 @@ module AlmaRestClient
         columns.keys.each {|k| my_row[columns[k]] = row[k] }
         block.call(my_row)
       end
-      if xml&.dig("QueryResult","IsFinished") != 'true'
+      if xml.dig("QueryResult","IsFinished") != 'true'
         xml = fetch_report_page(query, retries)
         report_loop(xml, columns, query, retries, &block)
       end
