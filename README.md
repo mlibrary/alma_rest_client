@@ -77,6 +77,9 @@ my_array = []
 response = client.get_report(path: '/shared/University of Michigan 01UMICH_INST/Reports/fake-data') do |row|
   my_array.push(row)
 end
+
+#optional 'retries' parameter is for how many times to retry a page of the report. Default is 2.
+response = client.get_report(path: '/shared/University of Michigan 01UMICH_INST/Reports/fake-data', retries: 5)
 ```
 
 ## How to Contribute

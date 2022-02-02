@@ -137,16 +137,27 @@ RSpec.describe AlmaRestClient::Client do
       response = described_class.new.get_report(path: path)
       expect(response.class.name).to eq("AlmaRestClient::Response")
       expect(response.code).to eq(500)
-      expect(response.message).to eq('Could not retrieve report.')
+      expect(response.message).to include('undefined method')
       expect(stub1).to have_been_requested.times(1)
       expect(stub2).to have_been_requested.times(2)
     end
+    it "will try up to the number of retries given" do
+      stub1 = stub_alma_get_request( query: {**alma_query_params}, output: circ_history1, url: base_report_url) 
+      stub2 = stub_alma_get_request(url: base_report_url, query: {**alma_query_params, "token" => "fakeResumptionToken"}, status: 500 )
+      response = described_class.new.get_report(path: path, retries: 5)
+      expect(response.class.name).to eq("AlmaRestClient::Response")
+      expect(response.code).to eq(500)
+      expect(response.message).to include('undefined method')
+      expect(stub1).to have_been_requested.times(1)
+      expect(stub2).to have_been_requested.times(5)
+    end
+
     it "if alma requests fail to get everything on first page, it tries again and if it fails again it returns an error" do
       stub1 = stub_alma_get_request(url: base_report_url, query: {**alma_query_params}, status: 500 )
       response = described_class.new.get_report(path: path)
       expect(response.class.name).to eq("AlmaRestClient::Response")
       expect(response.code).to eq(500)
-      expect(response.message).to eq('Could not retrieve report.')
+      expect(response.message).to include('undefined method')
       expect(stub1).to have_been_requested.times(2)
     end
     it "if alma requests succeed the second time, returns the expected result" do
