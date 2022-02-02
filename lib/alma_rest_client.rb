@@ -1,6 +1,9 @@
 require "alma_rest_client/version"
-require 'httparty'
+require "httparty"
+require "active_support"
 require 'active_support/core_ext/hash/conversions'
+require "byebug"
+require "logger"
 
 module AlmaRestClient
   class Error < StandardError; end
@@ -21,6 +24,7 @@ module AlmaRestClient
       self.class.headers 'Authorization' => "apikey #{ENV.fetch('ALMA_API_KEY')}"
       self.class.headers 'Accept' => 'application/json'
       self.class.headers 'Content-Type' => 'application/json'
+      self.class.headers 'Cache-Control' => 'no-cache'
     end
 
     [:get, :post, :delete, :put].each do |name|
