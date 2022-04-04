@@ -2,7 +2,6 @@ require "alma_rest_client/version"
 require "httparty"
 require "active_support"
 require 'active_support/core_ext/hash/conversions'
-require "byebug"
 require "logger"
 
 module AlmaRestClient
