@@ -22,8 +22,9 @@ end
       accept: 'application/json', 
       Authorization: "apikey #{ENV['ALMA_API_KEY']}",
       'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-      'User-Agent'=>'Ruby',
-      'Content-Type' => 'application/json'
+      'Content-Type' => 'application/json',
+      'User-Agent'=>'Faraday v2.3.0',
+      'Cache-Control' => 'no-cache'
     }
     req_attributes[:body] = input unless input.nil?
     req_attributes[:query] = query unless query.nil?

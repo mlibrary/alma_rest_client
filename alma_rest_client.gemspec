@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency "rexml"
   spec.add_runtime_dependency "httparty"
+  spec.add_runtime_dependency "faraday"
   spec.add_runtime_dependency "activesupport", '>= 4.2', '~> 7.0'
 
 

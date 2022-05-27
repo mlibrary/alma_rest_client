@@ -18,5 +18,7 @@ jobs:
           ruby-version: 3.1.0
       - name: Bundle install
         run: bundle install
+      - name: Run linter for Ruby
+        run: bundle exec standardrb
       - name: Run tests
         run: bundle exec rspec
