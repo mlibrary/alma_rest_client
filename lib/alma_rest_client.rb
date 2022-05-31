@@ -1,4 +1,5 @@
 require "alma_rest_client/version"
+require "alma_rest_client/configuration"
 require "alma_rest_client/error"
 require "alma_rest_client/response"
 
@@ -12,7 +13,15 @@ require "alma_rest_client/client"
 require "alma_rest_client/test/helpers"
 
 module AlmaRestClient
-  def self.client
-    Client.new
+  class << self
+    def client
+      Client.new
+    end
+    def configuration
+      @configuration ||= Configuration.new
+    end
+    def configure 
+      yield(configuration)
+    end
   end
 end

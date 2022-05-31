@@ -2,9 +2,9 @@ module AlmaRestClient
   class Client
     def initialize
       @conn = Faraday.new(
-        url: ENV.fetch("ALMA_API_HOST").to_s,
+        url: AlmaRestClient.configuration.alma_api_host,
         headers: {
-          "Authorization" => "apikey #{ENV.fetch("ALMA_API_KEY")}",
+          "Authorization" => "apikey #{AlmaRestClient.configuration.alma_api_key}",
           "Accept" => "application/json",
           "Content-Type" => "application/json",
           "Cache-Control" => "no-cache"

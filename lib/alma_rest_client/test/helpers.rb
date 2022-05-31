@@ -6,7 +6,7 @@ module AlmaRestClient
           req_attributes = {}
           req_attributes[:headers] = {
             :accept => "application/json",
-            :Authorization => "apikey #{ENV["ALMA_API_KEY"]}",
+            :Authorization => "apikey #{AlmaRestClient.configuration.alma_api_key}",
             "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
             "Content-Type" => "application/json",
             "User-Agent" => "Faraday v2.3.0",
@@ -16,7 +16,7 @@ module AlmaRestClient
           req_attributes[:query] = query unless query.nil?
           resp = {headers: {content_type: "application/json"}, status: status, body: output}
 
-          stub_request(name, "#{ENV["ALMA_API_HOST"]}/almaws/v1/#{url}").with(**req_attributes).to_return(**resp)
+          stub_request(name, "#{AlmaRestClient.configuration.alma_api_host}/almaws/v1/#{url}").with(**req_attributes).to_return(**resp)
         end
       end
     end
