@@ -17,10 +17,12 @@ module AlmaRestClient
     def client
       Client.new
     end
+
     def configuration
       @configuration ||= Configuration.new
     end
-    def configure 
+
+    def configure
       yield(configuration)
     end
   end

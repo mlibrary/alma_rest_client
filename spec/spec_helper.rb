@@ -3,9 +3,9 @@ require "alma_rest_client"
 require "webmock/rspec"
 require "byebug"
 require "simplecov"
-include AlmaRestClient::Test::Helpers
 SimpleCov.start
 RSpec.configure do |config|
+  include AlmaRestClient::Test::Helpers
   # Enable flags like --only-failures and --next-failure
   config.example_status_persistence_file_path = ".rspec_status"
 
