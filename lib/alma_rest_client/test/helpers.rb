@@ -9,7 +9,7 @@ module AlmaRestClient
             :Authorization => "apikey #{AlmaRestClient.configuration.alma_api_key}",
             "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
             "Content-Type" => "application/json",
-            "User-Agent" => "Faraday v2.3.0",
+            "User-Agent" => "Ruby AlmaRestClient",
             "Cache-Control" => "no-cache"
           }
           req_attributes[:body] = input unless input.nil?

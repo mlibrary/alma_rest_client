@@ -14,8 +14,8 @@ require "alma_rest_client/test/helpers"
 
 module AlmaRestClient
   class << self
-    def client
-      Client.new
+    def client(conn=Faraday.new)
+      Client.new(conn)
     end
 
     def configuration
