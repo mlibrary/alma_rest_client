@@ -8,18 +8,23 @@ require "active_support/core_ext/hash/conversions"
 require "logger"
 require "faraday"
 require "faraday/retry"
+require "httpx/adapters/faraday"
 require "alma_rest_client/client"
 
 require "alma_rest_client/test/helpers"
 
 module AlmaRestClient
   class << self
-    def client(conn=Faraday.new)
+    def client(conn = Faraday.new)
       Client.new(conn)
     end
 
     def configuration
       @configuration ||= Configuration.new
+    end
+
+    def set_default_config
+      @configuration = Configuration.new
     end
 
     def configure

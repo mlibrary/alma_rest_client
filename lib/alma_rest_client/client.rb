@@ -1,20 +1,22 @@
 module AlmaRestClient
   class Client
     def initialize(conn = Faraday.new)
+      config = AlmaRestClient.configuration
       @conn = conn
-      @conn.headers.merge! ( {
-        "Authorization" => "apikey #{AlmaRestClient.configuration.alma_api_key}",
+      @conn.headers.merge!({
+        "Authorization" => "apikey #{config.alma_api_key}",
         "Accept" => "application/json",
         "Content-Type" => "application/json",
         "Cache-Control" => "no-cache",
         "User-Agent" => "Ruby AlmaRestClient"
       })
-      @conn.url_prefix =AlmaRestClient.configuration.alma_api_host
- 
+      @conn.url_prefix = config.alma_api_host
+
       @conn.builder.build do |f|
         f.request :json
-        f.request :retry, {max: 1, retry_statuses: [500]}
+        f.request :retry, config.retry_options
         f.response :json
+        f.adapter config.http_adapter
       end
     end
     [:get, :post, :delete, :put].each do |name|

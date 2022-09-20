@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency "rexml"
   spec.add_runtime_dependency "faraday"
+  spec.add_runtime_dependency "httpx"
   spec.add_runtime_dependency "faraday-retry"
   spec.add_runtime_dependency "activesupport", ">= 4.2", "~> 7.0"
 
@@ -37,4 +38,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "webmock"
   spec.add_development_dependency "simplecov"
+  spec.add_development_dependency "climate_control"
 end

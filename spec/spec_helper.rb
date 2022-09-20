@@ -3,6 +3,9 @@ require "alma_rest_client"
 require "webmock/rspec"
 require "byebug"
 require "simplecov"
+require "climate_control"
+require "httpx/adapters/webmock"
+
 SimpleCov.start
 RSpec.configure do |config|
   include AlmaRestClient::Test::Helpers
@@ -15,4 +18,7 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+end
+def with_modified_env(options = {}, &block)
+  ClimateControl.modify(options, &block)
 end
