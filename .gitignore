@@ -6,6 +6,7 @@
 /pkg/
 /spec/reports/
 /tmp/
+Gemfile.lock
 
 # rspec failure tracking
 .rspec_status
@@ -15,3 +16,5 @@
 .byebug_history
 .env
 .irb_history
+.cache
+

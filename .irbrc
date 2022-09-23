@@ -1,1 +1,1 @@
-require 'alma_rest_client'
+require "alma_rest_client"
