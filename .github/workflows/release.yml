@@ -1,0 +1,40 @@
+name: Release
+on:
+  workflow_run:
+    workflows: [ 'Run Tests' ]
+    branches: [ 'main' ]
+    types: [ completed ]
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: GoogleCloudPlatform/release-please-action@v2
+        id: release
+        with:
+          release-type: ruby
+          package-name: sftp
+          bump-minor-pre-major: true
+          version-file: "lib/alma_rest_client/version.rb"
+      # Checkout code if release was created
+      - uses: actions/checkout@v2
+        if: ${{ steps.release.outputs.release_created }}
+      # Setup ruby if a release was created
+      - uses: ruby/setup-ruby@v1
+        if: ${{ steps.release.outputs.release_created }}
+        with:
+          ruby-version: 3.1
+      - name: Set Credentials
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          mkdir -p $HOME/.gem
+          touch $HOME/.gem/credentials
+          chmod 0600 $HOME/.gem/credentials
+          printf -- "---\n:github: Bearer ${GITHUB_TOKEN}\n" > $HOME/.gem/credentials
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Publish to GitHub Packages
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          export OWNER=$( echo ${{ github.repository }} | cut -d "/" -f 1 )
+          gem build *.gemspec
+          gem push --KEY github --host https://rubygems.pkg.github.com/${OWNER} *.gem
