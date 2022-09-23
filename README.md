@@ -2,31 +2,43 @@
 
 This gem retrieves Alma data from the Alma API. It extends the HTTParty gem.
 
-## Installation
+## Minimal Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'alma_rest_client',
-  git: 'https://github.com/mlibrary/alma_rest_client', 
-  tag: '1.2.0' #this is the github release tag. It should match the gem version number. 
+source "https://rubygems.pkg.github.com/mlibrary" do
+  gem "alma_rest_client", "~> 2.0"
+end
 ```
 
 And then execute:
-
-    $ bundle install
+```
+$ bundle install
+```
 
 Or install it yourself as:
+```
+$ gem install alma_rest_client
+```
 
-    $ gem install alma_rest_client
+Set the API key.
 
 Set the following environment variables
 ```
-ALMA_API_HOST
 ALMA_API_KEY
 ```
+
+Or directly configure it:
+```ruby
+AlmaRestClient.configure do |config|
+  config.alma_api_key = ENV.fetch("ENV_VAR_WITH_API_KEY")
+end
+```
+
 ## Usage
-All of the following methods return an HTTParty::Response from Alma
+All of the following methods return a `Faraday::Response` object from Alma
+
 ```ruby
 #all are instance methods
 client = AlmaRestClient.client
@@ -81,6 +93,76 @@ end
 #optional 'retries' parameter is for how many times to retry a page of the report. Default is 2.
 response = client.get_report(path: '/shared/University of Michigan 01UMICH_INST/Reports/fake-data', retries: 5)
 ```
+## Configuration
+
+### Environment Variables
+Configuration of the Alma API Key and the Alma host can be done with the following environment variables
+
+```
+ALMA_API_KEY
+ALMA_API_HOST
+```
+### Direct Configuration
+The gem can be configured directly with this pattern:
+
+```ruby
+AlmaRestClient.configure do |config|
+  config.alma_api_key = ENV.fetch("ENV_VAR_WITH_API_KEY")
+end
+```
+Configuring directly overrides the environment variables. 
+
+### Configuration Options
+Below are the configuration options and their defaults:
+|Name|Description|Default Value|
+|---|---|---|
+|`alma_api_key`|The Alma API Key that has the appropriate permissions|`""`|
+|`alma_api_host`|The base exlibris url | `https://api-na.hosted.exlibrisgroup.com`|
+| `http_adapter` | The http adapter for Faraday to use | `:httpx` |
+| `retry_options` | A hash of options for the [retry adapter for Faraday](https://github.com/lostisland/faraday-retry) | `{ max: 1, retry_statuses: [500] }` |
+
+## Using a custom Faraday connection object
+
+The `AlmaRestClient::Client` object can be initialized with a `Faraday::Connection` object like so:
+```ruby
+conn = Faraday.new do
+# Whatever special setting you want
+end
+AlmaRestClient.new(conn)
+```
+The `adapter` will still be set to whatever is in `http_adapter`. The `retry` adapter must also be configured in the configuration options.
+
+## Rspec Test Helpers
+This gem includes `rspec` test helpers. They require the [Webmock library](https://github.com/bblimke/webmock). To use them put the following in your `spec_helper.rb`
+
+```ruby
+require "alma_rest_client"
+require "webmock/rspec"
+require "httpx/adapters/webmock"
+
+Rspec.configure do |config|
+  include AlmaRestClient::Test::Helpers
+# ....
+end
+```
+
+This will give you the following stubs:
+```
+stub_alma_get_request(url:, input:, output:, status:, query:, no_return)
+stub_alma_post_request(url:, input:, output:, status:, query:, no_return)
+stub_alma_put_request(url:, input:, output:, status:, query:, no_return)
+stub_alma_delete_request(url:, input:, output:, status:, query:, no_return)
+```
+The parameters are described below.
+|parameter| description | default|
+|---|---|---|
+|`url`| The path to the api endpoint that you would use with the actual client | (required) |
+|`input`| The body of the input given to the  request | `nil` |
+|`output`| The body the stubbed request should return | `nil` |
+|`status`| The status the stubbed request should return | `200` |
+|`query`| The query parameters that should be part of the stubbed request | `nil` |
+|`no_return`| This is for when you want to add to the stub, like `to_raise`. If this is not nil, then `output` will be ignored. | `nil` |
+
 
 ## How to Contribute
 
