@@ -12,7 +12,7 @@ module AlmaRestClient
 
           resp = {headers: {content_type: "application/json"}, status: status, body: output}
 
-          req = stub_request(name, "#{AlmaRestClient.configuration.alma_api_host}/almaws/v1/#{url}").with(**req_attributes)
+          req = stub_request(name, "#{AlmaRestClient.configuration.alma_api_host}/almaws/v1/#{url.sub(/^\//, "")}").with(**req_attributes)
           req.to_return(**resp) if no_return.nil?
           req
         end
