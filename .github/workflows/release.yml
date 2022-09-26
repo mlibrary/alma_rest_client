@@ -12,7 +12,7 @@ jobs:
         id: release
         with:
           release-type: ruby
-          package-name: sftp
+          package-name: alma_rest_client
           bump-minor-pre-major: true
           version-file: "lib/alma_rest_client/version.rb"
       # Checkout code if release was created
