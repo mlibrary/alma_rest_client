@@ -1,6 +1,5 @@
 {
   "release-type": "ruby",
-  "last-release-sha": "9606225d82480b6d1568902813ae9018dd8c1acc",
   "packages": {
     ".": {
       "release-type": "ruby",
