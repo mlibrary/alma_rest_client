@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/mlibrary/alma_rest_client/compare/alma_rest_client-v2.0.0...alma_rest_client/v2.1.0) (2025-04-07)
+
+
+### Features
+
+* updates to active_support 8 ([f3b3e6a](https://github.com/mlibrary/alma_rest_client/commit/f3b3e6a5d1c085002f9c94f78e6ba124e819b5ca))
+
 ## [2.0.0](https://www.github.com/mlibrary/alma_rest_client/compare/v1.3.1...v2.0.0) (2022-09-26)
 
 
