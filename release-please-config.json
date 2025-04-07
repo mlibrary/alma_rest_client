@@ -1,0 +1,9 @@
+{
+  "release-type": "ruby",
+  "packages": {
+    ".": {
+      "release-type": "ruby",
+      "package-name": "alma_rest_client"
+    }
+  }
+}

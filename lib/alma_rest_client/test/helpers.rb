@@ -2,7 +2,7 @@ module AlmaRestClient
   module Test
     module Helpers
       [:get, :post, :put, :delete].each do |name|
-        define_method("stub_alma_#{name}_request") do |url:, input: nil, output: "", status: 200, query: nil, no_return: nil|
+        define_method(:"stub_alma_#{name}_request") do |url:, input: nil, output: "", status: 200, query: nil, no_return: nil|
           req_attributes = {}
           req_attributes[:headers] = {
             "Authorization" => "apikey #{AlmaRestClient.configuration.alma_api_key}"
