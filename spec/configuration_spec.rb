@@ -39,12 +39,16 @@ RSpec.describe AlmaRestClient, "#configuration" do
     end
   end
   context "http_adapter" do
-    it "can be set to something else" do
+    it "can be set to something else when given a symbol" do
       AlmaRestClient.configure { |config| config.http_adapter = :my_http_adapter }
-      expect(subject.http_adapter).to eq(:my_http_adapter)
+      expect(subject.http_adapter).to eq([:my_http_adapter])
+    end
+    it "can be set to an array" do
+      AlmaRestClient.configure { |config| config.http_adapter = [:my_http_adapter] }
+      expect(subject.http_adapter).to eq([:my_http_adapter])
     end
     it "has httpx as the default adapter" do
-      expect(subject.http_adapter).to eq(:httpx)
+      expect(subject.http_adapter).to eq([:httpx])
     end
   end
   context "retry_options" do
