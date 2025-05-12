@@ -16,7 +16,7 @@ module AlmaRestClient
         f.request :json
         f.request :retry, config.retry_options
         f.response :json
-        f.adapter config.http_adapter
+        f.adapter(*config.http_adapter)
       end
     end
     [:get, :post, :delete, :put].each do |name|
