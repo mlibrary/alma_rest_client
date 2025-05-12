@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/mlibrary/alma_rest_client/compare/alma_rest_client/v2.1.0...alma_rest_client/v2.2.0) (2025-05-12)
+
+
+### Features
+
+* allow array of parameters to http_adapter ([7f74689](https://github.com/mlibrary/alma_rest_client/commit/7f74689fe99871ab8c915d73e7321424c5045eef))
+
 ## [2.1.0](https://github.com/mlibrary/alma_rest_client/compare/alma_rest_client-v2.0.0...alma_rest_client/v2.1.0) (2025-04-07)
 
 
