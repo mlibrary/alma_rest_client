@@ -13,6 +13,7 @@ module AlmaRestClient
       @conn.url_prefix = config.alma_api_host
 
       @conn.builder.build do |f|
+        f.request :instrumentation, name: "request.alma_rest_client"
         f.request :json
         f.request :retry, config.retry_options
         f.response :json
