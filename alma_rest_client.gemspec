@@ -6,8 +6,8 @@ Gem::Specification.new do |spec|
   spec.authors = ["Monique Rio"]
   spec.email = ["mrio@umich.edu"]
 
-  spec.summary = ""
-  spec.description = ""
+  spec.summary = "API client for ExLibris Alma's Rest API"
+  spec.description = spec.summary
   spec.homepage = "https://github.com/mlibrary/alma_rest_client"
   spec.license = "BSD 3"
   spec.required_ruby_version = Gem::Requirement.new(">= 3.2.0")
