@@ -24,12 +24,12 @@ $ gem install alma_rest_client
 
 Set the API key.
 
-Set the following environment variables
+You can set the API Key by setting the following environment variable:
 ```
 ALMA_API_KEY
 ```
 
-Or directly configure it:
+Or by directly configure the gem:
 ```ruby
 AlmaRestClient.configure do |config|
   config.alma_api_key = ENV.fetch("ENV_VAR_WITH_API_KEY")
